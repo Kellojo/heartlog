@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { desc, eq, inArray, isNull, lt } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, lt } from "drizzle-orm";
 import { db } from "$lib/server/db";
 import { post, postImage, postReaction, user } from "$lib/server/db/schema";
 import { createPostSchema } from "$lib/validation";
@@ -12,17 +12,17 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const cursor = url.searchParams.get("cursor");
   const limit = Math.min(Number(url.searchParams.get("limit") || "20"), 50);
 
-  let query = db
+  const where = cursor
+    ? and(isNull(post.deletedAt), lt(post.createdAt, new Date(Number(cursor))))
+    : isNull(post.deletedAt);
+
+  const query = db
     .select()
     .from(post)
     .leftJoin(user, eq(post.authorId, user.id))
-    .where(isNull(post.deletedAt))
+    .where(where)
     .orderBy(desc(post.createdAt))
     .limit(limit + 1);
-
-  if (cursor) {
-    query = query.where(lt(post.createdAt, new Date(Number(cursor))));
-  }
 
   const rows = await query;
   const hasMore = rows.length > limit;

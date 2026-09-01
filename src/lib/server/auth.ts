@@ -4,7 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { getRequestEvent } from "$app/server";
 import { db } from "$lib/server/db";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, genericOAuth } from "better-auth/plugins";
 
 export const auth = betterAuth({
   baseURL: env.ORIGIN || "http://localhost:5173",
@@ -14,14 +14,22 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: true,
   },
-  socialProviders: env.OIDC_ISSUER
-    ? {
-        oidc: {
-          issuer: env.OIDC_ISSUER,
-          clientId: env.OIDC_CLIENT_ID || "",
-          clientSecret: env.OIDC_CLIENT_SECRET || "",
-        },
-      }
-    : undefined,
-  plugins: [sveltekitCookies(getRequestEvent)],
+  plugins: [
+    sveltekitCookies(getRequestEvent),
+    ...(env.OIDC_ISSUER
+      ? [
+          genericOAuth({
+            config: [
+              {
+                providerId: "oidc",
+                name: "OIDC",
+                discoveryUrl: env.OIDC_ISSUER + "/.well-known/openid-configuration",
+                clientId: env.OIDC_CLIENT_ID || "",
+                clientSecret: env.OIDC_CLIENT_SECRET || "",
+              },
+            ],
+          }),
+        ]
+      : []),
+  ],
 });
