@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heartlog — Design Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            rose: {
+              50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+              400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c',
+              800: '#9f1239', 900: '#881337',
+            }
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #fafafa;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .glass-input {
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .glass-input:focus {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(244, 63, 94, 0.4);
+      outline: none;
+    }
+    .glass-input::placeholder {
+      color: #9ca3af;
+    }
+    .post-card {
+      transition: border-color 0.2s ease;
+    }
+    .post-card:hover {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .reaction-pill {
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .reaction-pill:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    .reaction-pill.active {
+      background: rgba(244, 63, 94, 0.1);
+      border-color: rgba(244, 63, 94, 0.25);
+    }
+    .emoji-btn {
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .emoji-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
+      transform: scale(1.1);
+    }
+    .image-grid img {
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+    .image-grid button:hover img {
+      transform: scale(1.02);
+      filter: brightness(1.05);
+    }
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(4px);
+    }
+    .modal-content {
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .viewer-backdrop {
+      background: rgba(0, 0, 0, 0.85);
+    }
+    .viewer-img {
+      animation: viewerIn 0.3s ease;
+    }
+    @keyframes viewerIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn-primary {
+      background: #e11d48;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .btn-primary:hover {
+      background: #be123c;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+    .upload-zone {
+      border: 1px dashed rgba(0, 0, 0, 0.12);
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: rgba(244, 63, 94, 0.4);
+      background: rgba(244, 63, 94, 0.03);
+    }
+    .preview-thumb {
+      animation: thumbIn 0.2s ease;
+    }
+    @keyframes thumbIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+  </style>
+</head>
+<body class="text-gray-800 antialiased">
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-40 glass">
+    <div class="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+      <h1 class="text-lg font-semibold text-rose-600">heartlog</h1>
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center text-xs font-medium text-rose-600">A</div>
+        <button class="text-sm text-gray-400 hover:text-gray-600 transition">logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-2xl mx-auto px-4 pt-20 pb-16">
+
+    <!-- Create post -->
+    <div class="mb-6">
+      <div class="glass rounded-2xl p-4 cursor-pointer hover:border-black/10 transition group" onclick="openModal()">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm font-medium text-rose-600 shrink-0">A</div>
+          <span class="text-gray-400 group-hover:text-gray-500 transition text-sm">What's on your mind?</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <div class="space-y-4">
+
+      <!-- Post 1 -->
+      <article class="post-card glass rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center text-xs font-medium text-rose-600">A</div>
+          <div>
+            <p class="text-sm font-medium text-gray-800">Alex</p>
+            <p class="text-xs text-gray-400">2 hours ago</p>
+          </div>
+        </div>
+        <h2 class="font-semibold text-gray-800 mb-1.5">Sunday morning pancakes</h2>
+        <p class="text-gray-600 text-sm leading-relaxed mb-3">Made your favorite blueberry pancakes today. The kitchen smelled like heaven and you smiled that smile that makes everything worth it.</p>
+        <div class="image-grid grid grid-cols-2 gap-1.5 mb-3">
+          <button class="relative aspect-square rounded-xl overflow-hidden" onclick="openViewer(0)">
+            <img src="https://picsum.photos/seed/pancake1/400/400" alt="" class="w-full h-full object-cover">
+          </button>
+          <button class="relative aspect-square rounded-xl overflow-hidden" onclick="openViewer(1)">
+            <img src="https://picsum.photos/seed/pancake2/400/400" alt="" class="w-full h-full object-cover">
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button class="reaction-pill active glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1" onclick="toggleReaction(this)">
+            <span>❤️</span><span class="text-xs text-gray-500">3</span>
+          </button>
+          <button class="reaction-pill glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1" onclick="toggleReaction(this)">
+            <span>😊</span><span class="text-xs text-gray-500">1</span>
+          </button>
+          <button class="reaction-pill glass rounded-full px-2.5 py-1 text-sm text-gray-300 hover:text-gray-400" onclick="showEmojiPicker(this)">
+            <span>+</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- Post 2 -->
+      <article class="post-card glass rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-xs font-medium text-violet-600">J</div>
+          <div>
+            <p class="text-sm font-medium text-gray-800">Jordan</p>
+            <p class="text-xs text-gray-400">Yesterday</p>
+          </div>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed mb-3">Walked along the river tonight and talked about everything and nothing. These are the moments I want to remember forever.</p>
+        <div class="image-grid grid grid-cols-1 gap-1.5 mb-3">
+          <button class="relative aspect-video rounded-xl overflow-hidden" onclick="openViewer(2)">
+            <img src="https://picsum.photos/seed/river/800/450" alt="" class="w-full h-full object-cover">
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button class="reaction-pill glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1" onclick="toggleReaction(this)">
+            <span>🥰</span><span class="text-xs text-gray-500">2</span>
+          </button>
+          <button class="reaction-pill glass rounded-full px-2.5 py-1 text-sm text-gray-300 hover:text-gray-400" onclick="showEmojiPicker(this)">
+            <span>+</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- Post 3 -->
+      <article class="post-card glass rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center text-xs font-medium text-rose-600">A</div>
+          <div>
+            <p class="text-sm font-medium text-gray-800">Alex</p>
+            <p class="text-xs text-gray-400">3 days ago</p>
+          </div>
+        </div>
+        <h2 class="font-semibold text-gray-800 mb-1.5">Anniversary dinner</h2>
+        <p class="text-gray-600 text-sm leading-relaxed mb-3">Two years down, forever to go. Thank you for choosing me every single day.</p>
+        <div class="image-grid grid grid-cols-3 gap-1.5 mb-3">
+          <button class="relative aspect-square rounded-xl overflow-hidden" onclick="openViewer(3)">
+            <img src="https://picsum.photos/seed/dinner1/400/400" alt="" class="w-full h-full object-cover">
+          </button>
+          <button class="relative aspect-square rounded-xl overflow-hidden" onclick="openViewer(4)">
+            <img src="https://picsum.photos/seed/dinner2/400/400" alt="" class="w-full h-full object-cover">
+          </button>
+          <button class="relative aspect-square rounded-xl overflow-hidden" onclick="openViewer(5)">
+            <img src="https://picsum.photos/seed/dinner3/400/400" alt="" class="w-full h-full object-cover">
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button class="reaction-pill active glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1" onclick="toggleReaction(this)">
+            <span>❤️</span><span class="text-xs text-gray-500">5</span>
+          </button>
+          <button class="reaction-pill active glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1" onclick="toggleReaction(this)">
+            <span>🎉</span><span class="text-xs text-gray-500">2</span>
+          </button>
+          <button class="reaction-pill glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1onioReaction(this)">
+            <span>😍</span><span class="text-xs text-gray-500">1</span>
+          </button>
+          <button class="reaction-pill glass rounded-full px-2.5 py-1 text-sm text-gray-300 hover:text-gray-400" onclick="showEmojiPicker(this)">
+            <span>+</span>
+          </button>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="text-center py-6">
+      <span class="text-gray-300 text-sm">scroll for more</span>
+    </div>
+
+  </main>
+
+  <!-- Create Post Modal -->
+  <div id="createModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop" onclick="closeModal(event)">
+    <div class="modal-content glass rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="sticky top-0 glass border-b border-black/6 px-4 py-3 flex items-center justify-between rounded-t-2xl z-10">
+        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition text-sm">cancel</button>
+        <h2 class="font-medium text-gray-800">new post</h2>
+        <button class="btn-primary text-white text-sm font-medium rounded-lg px-3 py-1.5" onclick="submitPost()">post</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-xs font-medium text-rose-600">A</div>
+          <span class="text-sm text-gray-600">Alex</span>
+        </div>
+        <input type="text" placeholder="title (optional)" class="glass-input w-full rounded-xl px-3 py-2.5 text-sm text-gray-800">
+        <textarea placeholder="write something..." rows="4" class="glass-input w-full rounded-xl px-3 py-2.5 text-sm text-gray-800 resize-none"></textarea>
+        <div class="upload-zone rounded-xl p-5 text-center cursor-pointer" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault(); this.classList.remove('dragover'); handleDrop(event)">
+          <p class="text-sm text-gray-400">add photos</p>
+          <p class="text-xs text-gray-300 mt-0.5">or drag & drop</p>
+          <input type="file" id="fileInput" accept="image/*" multiple class="hidden" onchange="handleFiles(this.files)">
+        </div>
+        <div id="previewRow" class="flex gap-2 overflow-x-auto py-1 hidden"></div>
+        <button class="btn-primary w-full text-white font-medium rounded-xl px-4 py-2.5 text-sm" onclick="submitPost()">post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Viewer -->
+  <div id="imageViewer" class="fixed inset-0 z-50 hidden flex-col viewer-backdrop" onclick="closeViewer()">
+    <div class="flex items-center justify-between px-4 py-3 text-white">
+      <span id="viewerCounter" class="text-sm text-gray-400">1 / 6</span>
+      <button onclick="closeViewer()" class="text-gray-400 hover:text-white text-2xl transition">&times;</button>
+    </div>
+    <div class="flex-1 flex items-center justify-center relative px-4">
+      <img id="viewerImg" src="" alt="" class="viewer-img max-w-full max-h-full object-contain rounded-xl">
+      <button onclick="event.stopPropagation(); navViewer(-1)" class="absolute left-3 w-10 h-10 rounded-full glass flex items-center justify-center text-gray-400 hover:text-white text-xl transition">&#8249;</button>
+      <button onclick="event.stopPropagation(); navViewer(1)" class="absolute right-3 w-10 h-10 rounded-full glass flex items-center justify-center text-gray-400 hover:text-white text-xl transition">&#8250;</button>
+    </div>
+    <div class="px-4 py-3 text-center">
+      <p id="viewerCaption" class="text-sm text-gray-400"></p>
+    </div>
+  </div>
+
+  <!-- Emoji Picker -->
+  <div id="emojiPicker" class="fixed z-50 hidden glass rounded-xl p-1.5 shadow-xl">
+    <div class="flex gap-0.5">
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('❤️')">❤️</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('😊')">😊</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('🥰')">🥰</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('😍')">😍</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('💕')">💕</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('🎉')">🎉</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('🔥')">🔥</button>
+      <button class="emoji-btn text-xl p-1.5 rounded-lg" onclick="pickEmoji('😂')">😂</button>
+    </div>
+  </div>
+
+  <script>
+    const images = [
+      { src: 'https://picsum.photos/seed/pancake1/800/800', caption: 'Sunday morning pancakes' },
+      { src: 'https://picsum.photos/seed/pancake2/800/800', caption: 'Sunday morning pancakes' },
+      { src: 'https://picsum.photos/seed/river/1200/675', caption: 'River walk at dusk' },
+      { src: 'https://picsum.photos/seed/dinner1/800/800', caption: 'Anniversary dinner' },
+      { src: 'https://picsum.photos/seed/dinner2/800/800', caption: 'Anniversary dinner' },
+      { src: 'https://picsum.photos/seed/dinner3/800/800', caption: 'Anniversary dinner' },
+    ];
+    let viewerIndex = 0;
+    let currentPickerBtn = null;
+
+    function openModal() {
+      document.getElementById('createModal').classList.remove('hidden');
+      document.getElementById('createModal').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('createModal').classList.add('hidden');
+      document.getElementById('createModal').classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    function openViewer(index) {
+      viewerIndex = index;
+      updateViewer();
+      document.getElementById('imageViewer').classList.remove('hidden');
+      document.getElementById('imageViewer').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeViewer() {
+      document.getElementById('imageViewer').classList.add('hidden');
+      document.getElementById('imageViewer').classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    function navViewer(dir) {
+      viewerIndex = (viewerIndex + dir + images.length) % images.length;
+      updateViewer();
+    }
+
+    function updateViewer() {
+      const img = document.getElementById('viewerImg');
+      img.src = images[viewerIndex].src;
+      img.style.animation = 'none';
+      img.offsetHeight;
+      img.style.animation = '';
+      document.getElementById('viewerCounter').textContent = `${viewerIndex + 1} / ${images.length}`;
+      document.getElementById('viewerCaption').textContent = images[viewerIndex].caption;
+    }
+
+    function toggleReaction(btn) {
+      btn.classList.toggle('active');
+      const countSpan = btn.querySelector('span:last-child');
+      if (countSpan && !isNaN(parseInt(countSpan.textContent))) {
+        let count = parseInt(countSpan.textContent);
+        count = btn.classList.contains('active') ? count + 1 : count - 1;
+        countSpan.textContent = count;
+      }
+    }
+
+    function showEmojiPicker(btn) {
+      const picker = document.getElementById('emojiPicker');
+      const rect = btn.getBoundingClientRect();
+      picker.style.left = rect.left + 'px';
+      picker.style.top = (rect.top - 52) + 'px';
+      picker.classList.remove('hidden');
+      currentPickerBtn = btn;
+      setTimeout(() => {
+        document.addEventListener('click', hidePickerOnOutside);
+      }, 0);
+    }
+
+    function hidePickerOnOutside(e) {
+      const picker = document.getElementById('emojiPicker');
+      if (!picker.contains(e.target)) {
+        picker.classList.add('hidden');
+        document.removeEventListener('click', hidePickerOnOutside);
+      }
+    }
+
+    function pickEmoji(emoji) {
+      if (currentPickerBtn) {
+        const container = currentPickerBtn.parentElement;
+        const existing = Array.from(container.children).find(b => b.textContent.includes(emoji));
+        if (existing) {
+          toggleReaction(existing);
+        } else {
+          const newBtn = document.createElement('button');
+          newBtn.className = 'reaction-pill active glass rounded-full px-2.5 py-1 text-sm flex items-center gap-1';
+          newBtn.innerHTML = `<span>${emoji}</span><span class="text-xs text-gray-500">1</span>`;
+          newBtn.onclick = () => toggleReaction(newBtn);
+          container.insertBefore(newBtn, currentPickerBtn);
+        }
+      }
+      document.getElementById('emojiPicker').classList.add('hidden');
+    }
+
+    function handleFiles(files) {
+      const row = document.getElementById('previewRow');
+      row.classList.remove('hidden');
+      row.innerHTML = '';
+      Array.from(files).slice(0, 6).forEach((file) => {
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'preview-thumb relative shrink-0';
+        div.innerHTML = `
+          <img src="${url}" class="w-16 h-16 rounded-lg object-cover">
+          <button onclick="this.parentElement.remove()" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-black/70 text-white text-xs flex items-center justify-center hover:bg-black/90">&times;</button>
+        `;
+        row.appendChild(div);
+      });
+    }
+
+    function handleDrop(e) {
+      handleFiles(e.dataTransfer.files);
+    }
+
+    function submitPost() {
+      closeModal();
+      alert('Post created! (This is a preview)');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeViewer();
+        document.getElementById('emojiPicker').classList.add('hidden');
+      }
+      if (!document.getElementById('imageViewer').classList.contains('hidden')) {
+        if (e.key === 'ArrowLeft') navViewer(-1);
+        if (e.key === 'ArrowRight') navViewer(1);
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  heartlog:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - BETTER_AUTH_SECRET=change-me-to-a-random-32-char-string
+      - ORIGIN=http://localhost:3000
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
