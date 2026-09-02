@@ -11,7 +11,7 @@ export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET || "change-me-to-a-random-string",
   database: drizzleAdapter(db, { provider: "sqlite" }),
   emailAndPassword: {
-    enabled: true,
+    enabled: env.EMAIL_PASSWORD_ENABLED !== "false",
     autoSignIn: true,
   },
   plugins: [

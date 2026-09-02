@@ -2,9 +2,11 @@ import { fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import { auth } from "$lib/server/auth";
 import { APIError } from "better-auth/api";
+import { env } from "$env/dynamic/private";
 
 export const load: PageServerLoad = async (event) => {
   if (event.locals.user) throw redirect(302, "/");
+  if (env.EMAIL_PASSWORD_ENABLED === "false") throw redirect(302, "/login");
   return {};
 };
 

@@ -27,3 +27,5 @@ vite.config.ts.timestamp-*
 uploads
 app.db-shm
 app.db-wal
+local.db-wal
+local.db-shm

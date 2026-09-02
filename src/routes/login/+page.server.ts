@@ -6,7 +6,7 @@ import { env } from "$env/dynamic/private";
 
 export const load: PageServerLoad = async (event) => {
   if (event.locals.user) throw redirect(302, "/");
-  return { oidcAvailable: !!env.OIDC_ISSUER };
+  return { oidcAvailable: !!env.OIDC_ISSUER, oidcProviderName: env.OIDC_PROVIDER_NAME || "OIDC", emailPasswordEnabled: env.EMAIL_PASSWORD_ENABLED !== "false" };
 };
 
 export const actions: Actions = {
