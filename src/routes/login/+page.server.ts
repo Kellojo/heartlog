@@ -31,13 +31,20 @@ export const actions: Actions = {
   },
 
   signInOIDC: async (event) => {
-    const issuer = env.OIDC_ISSUER;
-    const clientId = env.OIDC_CLIENT_ID;
-    if (!issuer || !clientId) return fail(400, { error: "OIDC not configured" });
+    if (!env.OIDC_ISSUER || !env.OIDC_CLIENT_ID) return fail(400, { error: "OIDC not configured" });
 
-    throw redirect(
-      302,
-      `${issuer}/authorize?response_type=code&client_id=${clientId}&redirect_uri=${env.ORIGIN}/api/auth/callback/oidc&scope=openid profile email`
-    );
+    try {
+      const res = await auth.api.signInSocial({
+        body: { provider: "oidc", callbackURL: "/" },
+        headers: event.request.headers,
+      });
+      if (!res.url) return fail(500, { error: "Failed to start OIDC sign in" });
+      throw redirect(302, res.url);
+    } catch (e) {
+      if (e instanceof APIError) {
+        return fail(400, { error: e.message || "OIDC sign in failed" });
+      }
+      throw e;
+    }
   },
 };
