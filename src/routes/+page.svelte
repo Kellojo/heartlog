@@ -135,7 +135,7 @@
   }
 
   async function deletePost(postId: string) {
-    if (!confirm("delete this post?")) return;
+    if (!confirm("Do you really want to delete this post?")) return;
     const res = await fetch(`/api/posts/${postId}`, { method: "DELETE" });
     if (res.ok) {
       posts = posts.filter((p: typeof posts[0]) => p.id !== postId);

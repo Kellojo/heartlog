@@ -158,9 +158,11 @@ input, textarea, button {
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.image-grid button:hover img {
-  transform: scale(1.02);
-  filter: brightness(1.05);
+@media (hover: hover) {
+  .image-grid button:hover img {
+    transform: scale(1.02);
+    filter: brightness(1.05);
+  }
 }
 
 .modal-backdrop {
