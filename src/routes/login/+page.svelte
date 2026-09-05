@@ -10,7 +10,7 @@
     <div class="text-center mb-8">
       <div class="flex items-center justify-center gap-2.5">
         <svg class="w-9 h-9" viewBox="0 0 32 32"><path d="M16 28c-1 0-2-.5-4-2C5.5 20.6 2.5 15.5 3.6 9.7 3.8 6 6.2 4 8.8 4c3 0 5.6 1.8 7.2 4.6 1.6-2.8 4.2-4.6 7.2-4.6 2.6 0 5 2 5.2 5.7 1.1 5.8-1.9 10.9-8.4 16.3-2 1.5-3 2-4 2Z" fill="#e8437c"/></svg>
-        <h1 class="text-3xl font-semibold text-rose-600 tracking-tight">heartlog</h1>
+        <h1 class="text-3xl font-semibold text-rose-600 tracking-tight">Heartlog</h1>
       </div>
       <p class="text-gray-400 mt-2 text-sm">Your shared relationship journal</p>
     </div>

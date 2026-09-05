@@ -266,7 +266,7 @@
     <div class="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <svg class="w-6 h-6" viewBox="0 0 32 32"><path d="M16 28c-1 0-2-.5-4-2C5.5 20.6 2.5 15.5 3.6 9.7 3.8 6 6.2 4 8.8 4c3 0 5.6 1.8 7.2 4.6 1.6-2.8 4.2-4.6 7.2-4.6 2.6 0 5 2 5.2 5.7 1.1 5.8-1.9 10.9-8.4 16.3-2 1.5-3 2-4 2Z" fill="#e8437c"/></svg>
-        <h1 class="text-lg font-semibold accent-text">heartlog</h1>
+        <h1 class="text-lg font-semibold accent-text">Heartlog</h1>
       </div>
       <div class="flex items-center gap-3">
         <button onclick={toggleTheme} class="text-sm text-gray-400 hover:text-gray-600 transition cursor-pointer" title="Toggle theme">
@@ -556,11 +556,11 @@
       <span class="text-sm text-muted">{viewerIndex + 1} / {viewerImages.length}</span>
       <button onclick={closeViewer} class="text-muted hover:text-white text-2xl transition cursor-pointer">&times;</button>
     </div>
-    <div class="flex-1 flex items-center justify-center relative px-4">
+    <div class="flex-1 min-h-0 flex items-center justify-center relative px-4">
       <img
         src={viewerImages[viewerIndex].src}
         alt=""
-        class="viewer-img max-w-full max-h-full object-contain rounded-xl"
+        class="viewer-img min-h-0 max-w-full max-h-full object-contain rounded-xl"
       />
       {#if viewerIndex > 0}
         <button
