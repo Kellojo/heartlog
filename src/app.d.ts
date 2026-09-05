@@ -7,6 +7,8 @@ declare global {
       session?: Session;
     }
   }
+
+  const __VERSION__: string;
 }
 
 export {};
