@@ -22,23 +22,50 @@
   let isDark = $state(false);
   let showUserMenu = $state(false);
 
+  function isSystemDark() {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
   function toggleTheme() {
     isDark = !isDark;
     if (isDark) {
       document.documentElement.setAttribute("data-theme", "dark");
       localStorage.setItem("theme", "dark");
     } else {
-      document.documentElement.removeAttribute("data-theme");
+      document.documentElement.setAttribute("data-theme", "light");
       localStorage.setItem("theme", "light");
     }
   }
 
   $effect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      isDark = true;
-      document.documentElement.setAttribute("data-theme", "dark");
-    }
+    const mq = window.matchMedia("(min-width: 640px)");
+
+    const apply = () => {
+      if (!mq.matches) {
+        // Phones always follow the system theme
+        localStorage.removeItem("theme");
+        document.documentElement.removeAttribute("data-theme");
+        isDark = isSystemDark();
+        return;
+      }
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark" || saved === "light") {
+        isDark = saved === "dark";
+        document.documentElement.setAttribute("data-theme", saved);
+      } else {
+        isDark = isSystemDark();
+        document.documentElement.removeAttribute("data-theme");
+      }
+    };
+
+    apply();
+    mq.addEventListener("change", apply);
+    const darkMq = window.matchMedia("(prefers-color-scheme: dark)");
+    darkMq.addEventListener("change", apply);
+    return () => {
+      mq.removeEventListener("change", apply);
+      darkMq.removeEventListener("change", apply);
+    };
   });
 
   async function loadMore() {
@@ -269,7 +296,7 @@
         <h1 class="text-lg font-semibold accent-text">Heartlog</h1>
       </div>
       <div class="flex items-center gap-3">
-        <button onclick={toggleTheme} class="text-sm text-gray-400 hover:text-gray-600 transition cursor-pointer" title="Toggle theme">
+        <button onclick={toggleTheme} class="hidden sm:inline-flex text-sm text-gray-400 hover:text-gray-600 transition cursor-pointer" title="Toggle theme">
           {#if isDark}
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           {:else}

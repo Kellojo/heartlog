@@ -6,12 +6,26 @@
 		<meta name="text-scale" content="scale" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<link rel="manifest" href="/manifest.webmanifest" />
-		<meta name="theme-color" content="#0a0a0f" />
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa" />
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0c12" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 		<meta name="apple-mobile-web-app-title" content="Heartlog" />
 		<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+		<script>
+			(function () {
+				try {
+					var saved = localStorage.getItem("theme");
+					var isMobile = !window.matchMedia("(min-width: 640px)").matches;
+					if (!isMobile && (saved === "dark" || saved === "light")) {
+						document.documentElement.setAttribute("data-theme", saved);
+					} else {
+						document.documentElement.removeAttribute("data-theme");
+					}
+				} catch (e) {}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

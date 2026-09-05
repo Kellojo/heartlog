@@ -61,7 +61,40 @@ input, textarea, button {
   --popover-border: rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="dark"] {
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0c12;
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --text-faint: #4b5563;
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(255, 255, 255, 0.12);
+    --input-bg: rgba(255, 255, 255, 0.04);
+    --input-border: rgba(255, 255, 255, 0.08);
+    --input-focus-bg: rgba(255, 255, 255, 0.06);
+    --input-focus-border: rgba(244, 63, 94, 0.4);
+    --reaction-hover: rgba(255, 255, 255, 0.08);
+    --reaction-active-bg: rgba(244, 63, 94, 0.15);
+    --reaction-active-border: rgba(244, 63, 94, 0.3);
+    --upload-border: rgba(255, 255, 255, 0.15);
+    --upload-hover-border: rgba(244, 63, 94, 0.4);
+    --upload-hover-bg: rgba(244, 63, 94, 0.05);
+    --scrollbar: rgba(255, 255, 255, 0.08);
+    --accent: #f43f5e;
+    --accent-hover: #e11d48;
+    --accent-muted: rgba(244, 63, 94, 0.2);
+    --accent-muted-border: rgba(244, 63, 94, 0.3);
+    --accent-text: #fda4af;
+    --modal-backdrop: rgba(0, 0, 0, 0.5);
+    --viewer-backdrop: rgba(0, 0, 0, 0.92);
+    --popover-bg: rgba(20, 20, 28, 0.95);
+    --popover-border: rgba(255, 255, 255, 0.1);
+  }
+}
+
+:root[data-theme="dark"] {
   --bg: #0c0c12;
   --text-primary: #e5e7eb;
   --text-secondary: #9ca3af;
