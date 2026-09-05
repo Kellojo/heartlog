@@ -15,7 +15,7 @@
       <p class="text-gray-400 mt-2 text-sm">Create your account</p>
     </div>
 
-    <div class="glass rounded-2xl p-6">
+    <div class="glass card rounded-2xl p-6">
       <h2 class="text-lg font-medium text-gray-800 mb-5">Register</h2>
 
       <form method="post" action="?/signUp" use:enhance class="space-y-4">

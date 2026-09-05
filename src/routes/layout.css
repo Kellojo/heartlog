@@ -23,10 +23,14 @@ body {
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text-primary);
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
-input, textarea, button {
+input,
+textarea,
+button {
   font-family: var(--font-sans);
 }
 
@@ -39,9 +43,9 @@ input, textarea, button {
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.06);
   --glass-border-hover: rgba(0, 0, 0, 0.1);
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --input-border: rgba(0, 0, 0, 0.08);
-  --input-focus-bg: rgba(0, 0, 0, 0.05);
+  --input-bg: rgba(0, 0, 0, 0.1);
+  --input-border: rgba(0, 0, 0, 0.16);
+  --input-focus-bg: rgba(0, 0, 0, 0.07);
   --input-focus-border: rgba(244, 63, 94, 0.4);
   --reaction-hover: rgba(0, 0, 0, 0.06);
   --reaction-active-bg: rgba(244, 63, 94, 0.1);
@@ -57,8 +61,9 @@ input, textarea, button {
   --accent-text: #be123c;
   --modal-backdrop: rgba(0, 0, 0, 0.3);
   --viewer-backdrop: rgba(0, 0, 0, 0.85);
-  --popover-bg: rgba(255, 255, 255, 0.95);
+  --popover-bg: rgba(255, 255, 255, 1);
   --popover-border: rgba(0, 0, 0, 0.08);
+  --dialog-surface: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -71,9 +76,9 @@ input, textarea, button {
     --glass-bg: rgba(255, 255, 255, 0.04);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-border-hover: rgba(255, 255, 255, 0.12);
-    --input-bg: rgba(255, 255, 255, 0.04);
-    --input-border: rgba(255, 255, 255, 0.08);
-    --input-focus-bg: rgba(255, 255, 255, 0.06);
+    --input-bg: rgba(0, 0, 0, 0.04);
+    --input-border: rgba(255, 255, 255, 0.18);
+    --input-focus-bg: rgba(255, 255, 255, 0.1);
     --input-focus-border: rgba(244, 63, 94, 0.4);
     --reaction-hover: rgba(255, 255, 255, 0.08);
     --reaction-active-bg: rgba(244, 63, 94, 0.15);
@@ -91,6 +96,7 @@ input, textarea, button {
     --viewer-backdrop: rgba(0, 0, 0, 0.92);
     --popover-bg: rgba(20, 20, 28, 0.95);
     --popover-border: rgba(255, 255, 255, 0.1);
+    --dialog-surface: #1a1a22;
   }
 }
 
@@ -103,9 +109,9 @@ input, textarea, button {
   --glass-bg: rgba(255, 255, 255, 0.04);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-hover: rgba(255, 255, 255, 0.12);
-  --input-bg: rgba(255, 255, 255, 0.04);
-  --input-border: rgba(255, 255, 255, 0.08);
-  --input-focus-bg: rgba(255, 255, 255, 0.06);
+  --input-bg: rgba(255, 255, 255, 0.07);
+  --input-border: rgba(255, 255, 255, 0.18);
+  --input-focus-bg: rgba(255, 255, 255, 0.1);
   --input-focus-border: rgba(244, 63, 94, 0.4);
   --reaction-hover: rgba(255, 255, 255, 0.08);
   --reaction-active-bg: rgba(244, 63, 94, 0.15);
@@ -123,6 +129,7 @@ input, textarea, button {
   --viewer-backdrop: rgba(0, 0, 0, 0.92);
   --popover-bg: rgba(20, 20, 28, 0.95);
   --popover-border: rgba(255, 255, 255, 0.1);
+  --dialog-surface: #1a1a22;
 }
 
 .glass {
@@ -132,19 +139,28 @@ input, textarea, button {
   border: 1px solid var(--glass-border);
 }
 
+.card {
+  background: #ffffff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
 .popover {
   background: var(--popover-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--popover-border);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.modal-backdrop .popover {
+  box-shadow: none;
 }
 
 .glass-input {
   background: var(--input-bg);
-  border: 1px solid var(--input-border);
   color: var(--text-primary);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .glass-input:focus {
@@ -166,7 +182,9 @@ input, textarea, button {
 }
 
 .reaction-pill {
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 .reaction-pill:hover {
@@ -179,7 +197,9 @@ input, textarea, button {
 }
 
 .emoji-btn {
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 .emoji-btn:hover {
@@ -188,7 +208,9 @@ input, textarea, button {
 }
 
 .image-grid img {
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
 }
 
 @media (hover: hover) {
@@ -205,11 +227,20 @@ input, textarea, button {
 
 .modal-content {
   animation: modalIn 0.25s ease;
+  background: var(--dialog-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .viewer-backdrop {
@@ -221,14 +252,20 @@ input, textarea, button {
 }
 
 @keyframes viewerIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .btn-primary {
   background: var(--accent);
   color: white;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
 }
 
 .btn-primary:hover {
@@ -241,10 +278,13 @@ input, textarea, button {
 
 .upload-zone {
   border: 1px dashed var(--upload-border);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
-.upload-zone:hover, .upload-zone.dragover {
+.upload-zone:hover,
+.upload-zone.dragover {
   border-color: var(--upload-hover-border);
   background: var(--upload-hover-bg);
 }
@@ -254,18 +294,45 @@ input, textarea, button {
 }
 
 @keyframes thumbIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.text-primary { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-muted { color: var(--text-muted); }
-.text-faint { color: var(--text-faint); }
-.accent-text { color: var(--accent-text); }
-.accent-bg { background: var(--accent-muted); }
-.accent-border { border-color: var(--accent-muted-border); }
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-muted {
+  color: var(--text-muted);
+}
+.text-faint {
+  color: var(--text-faint);
+}
+.accent-text {
+  color: var(--accent-text);
+}
+.accent-bg {
+  background: var(--accent-muted);
+}
+.accent-border {
+  border-color: var(--accent-muted-border);
+}
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 3px;
+}
