@@ -13,6 +13,9 @@
   let loading = $state(false);
   let showCreate = $state(false);
   let editingPostId = $state<string | null>(null);
+  let removedImageIds = $state<string[]>([]);
+  let editPreviewFiles = $state<{ url: string; file: File }[]>([]);
+  let editDragOver = $state(false);
   let viewerImages = $state<{ src: string; index: number }[]>([]);
   let viewerIndex = $state(0);
   let previewFiles = $state<{ url: string; file: File }[]>([]);
@@ -123,6 +126,49 @@
     previewFiles = previewFiles.filter((_, i) => i !== index);
   }
 
+  function clearEditPreviews() {
+    editPreviewFiles.forEach((pf) => URL.revokeObjectURL(pf.url));
+    editPreviewFiles = [];
+    editDragOver = false;
+  }
+
+  function startEdit(postId: string) {
+    clearEditPreviews();
+    removedImageIds = [];
+    editingPostId = postId;
+  }
+
+  function cancelEdit() {
+    clearEditPreviews();
+    removedImageIds = [];
+    editingPostId = null;
+  }
+
+  function markImageRemoved(id: string) {
+    if (!removedImageIds.includes(id)) removedImageIds = [...removedImageIds, id];
+  }
+
+  function addEditPreviewFiles(post: { images: { id: string }[] }, files: FileList | File[]) {
+    const remaining = post.images.filter((img) => !removedImageIds.includes(img.id)).length;
+    const capacity = Math.max(0, 6 - remaining - editPreviewFiles.length);
+    const newFiles = Array.from(files)
+      .filter((f) => f.type.startsWith("image/"))
+      .slice(0, capacity)
+      .map((file) => ({ url: URL.createObjectURL(file), file }));
+    editPreviewFiles = [...editPreviewFiles, ...newFiles];
+  }
+
+  function removeEditPreview(index: number) {
+    URL.revokeObjectURL(editPreviewFiles[index].url);
+    editPreviewFiles = editPreviewFiles.filter((_, i) => i !== index);
+  }
+
+  function handleEditDrop(e: DragEvent, post: { images: { id: string }[] }) {
+    e.preventDefault();
+    editDragOver = false;
+    if (e.dataTransfer?.files) addEditPreviewFiles(post, e.dataTransfer.files);
+  }
+
   async function handleCreateSubmit(e: Event) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -150,13 +196,18 @@
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
 
+    removedImageIds.forEach((id) => formData.append("removedImages", id));
+    editPreviewFiles.forEach((pf) => formData.append("images", pf.file));
+
     const res = await fetch(`/api/posts/${postId}`, {
       method: "PUT",
       body: formData,
     });
 
     if (res.ok) {
-      editingPostId = null;
+      editPreviewFiles.forEach((pf) => URL.revokeObjectURL(pf.url));
+      editPreviewFiles = [];
+      cancelEdit();
       window.location.reload();
     }
   }
@@ -378,9 +429,77 @@
                 rows="4"
                 placeholder="What's on your mind?"
               >{postItem.content}</textarea>
-              <input name="images" type="file" accept="image/*" multiple class="text-sm text-gray-500" />
+
+              {#if postItem.images.length > 0}
+                <div>
+                  <p class="text-xs text-muted mb-1.5">Photos</p>
+                  <div class="grid grid-cols-3 gap-1.5">
+                    {#each postItem.images as image (image.id)}
+                      {#if !removedImageIds.includes(image.id)}
+                        <div class="relative aspect-square rounded-lg overflow-hidden group">
+                          <img
+                            src={`/api/images/${image.id}?type=thumbnails`}
+                            alt=""
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          <button
+                            type="button"
+                            onclick={() => markImageRemoved(image.id)}
+                            class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center cursor-pointer hover:bg-black/80"
+                            aria-label="Remove photo"
+                          >&times;</button>
+                        </div>
+                      {/if}
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+
+              {#if editPreviewFiles.length > 0}
+                <div class="grid grid-cols-3 gap-1.5">
+                  {#each editPreviewFiles as preview, i}
+                    <div class="relative aspect-square rounded-lg overflow-hidden">
+                      <img src={preview.url} alt="" class="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onclick={() => removeEditPreview(i)}
+                        class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center cursor-pointer hover:bg-black/80"
+                        aria-label="Remove photo"
+                      >&times;</button>
+                    </div>
+                  {/each}
+                </div>
+              {/if}
+
+              <div
+                class="upload-zone rounded-xl p-5 text-center cursor-pointer {editDragOver ? 'dragover' : ''}"
+                onclick={() => document.getElementById("editFileInput")?.click()}
+                ondragover={(e) => { e.preventDefault(); editDragOver = true; }}
+                ondragleave={() => (editDragOver = false)}
+                ondrop={(e) => handleEditDrop(e, postItem)}
+                role="button"
+                tabindex="0"
+                onkeydown={(e) => e.key === "Enter" && document.getElementById("editFileInput")?.click()}
+              >
+                <p class="text-sm text-muted">Add photos</p>
+                <p class="text-xs text-faint mt-0.5">Or drag & drop</p>
+                <input
+                  id="editFileInput"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  class="hidden"
+                  onchange={(e) => {
+                    const input = e.target as HTMLInputElement;
+                    if (input.files) addEditPreviewFiles(postItem, input.files);
+                    input.value = "";
+                  }}
+                />
+              </div>
+
               <div class="flex gap-2 justify-end">
-                <button type="button" onclick={() => (editingPostId = null)} class="px-3 py-1.5 text-sm text-muted hover:text-secondary transition cursor-pointer">Cancel</button>
+                <button type="button" onclick={cancelEdit} class="px-3 py-1.5 text-sm text-muted hover:text-secondary transition cursor-pointer">Cancel</button>
                 <button type="submit" class="btn-primary text-white text-sm font-medium rounded-lg px-3 py-1.5 cursor-pointer">Save</button>
               </div>
             </form>
@@ -399,12 +518,12 @@
               </div>
               {#if postItem.authorId === data.currentUser.id}
                 <div class="ml-auto flex gap-1">
-                  <button
-                    onclick={() => (editingPostId = postItem.id)}
-                    class="text-xs text-muted hover:text-secondary px-2 py-1 rounded-lg hover:bg-black/5 transition cursor-pointer"
-                  >
-                    Edit
-                  </button>
+                   <button
+                     onclick={() => startEdit(postItem.id)}
+                     class="text-xs text-muted hover:text-secondary px-2 py-1 rounded-lg hover:bg-black/5 transition cursor-pointer"
+                   >
+                     Edit
+                   </button>
                   <button
                     onclick={() => deletePost(postItem.id)}
                     class="text-xs text-muted hover:text-red-500 px-2 py-1 rounded-lg hover:bg-red-50 transition cursor-pointer"
